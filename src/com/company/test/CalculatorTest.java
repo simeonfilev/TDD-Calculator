@@ -10,7 +10,6 @@ public class CalculatorTest {
     @BeforeAll
     static void init(){
         calculator = new Calculator();
-
     }
 
     @Test
