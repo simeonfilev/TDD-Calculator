@@ -20,9 +20,6 @@ public class CalculatorTest {
         Assertions.assertEquals(5,calculator.calculate("1+4"));
         Assertions.assertEquals(3,calculator.calculate("5-2"));
         Assertions.assertEquals(3,calculator.calculate(" 5  - 2"));
-        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("5#2"));
-        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("S/2"));
-        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3**2"));
     }
 
     @Test
@@ -33,9 +30,6 @@ public class CalculatorTest {
         Assertions.assertEquals(20,calculator.calculate("10*2"));
         Assertions.assertEquals(8,calculator.calculate("10-2"));
         Assertions.assertEquals(8,calculator.calculate("  10 -   2"));
-        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3S/2"));
-        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("33//2"));
-        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("51#2"));
     }
 
     @Test
@@ -48,6 +42,18 @@ public class CalculatorTest {
         Assertions.assertEquals(40,calculator.calculate("5*10-2*5"));
         Assertions.assertEquals(14,calculator.calculate("(5+2)*2"));
         Assertions.assertEquals(2,calculator.calculate("((5+3)/2)/2"));
+    }
+
+    @Test
+    @DisplayName("ExpressionWithIllegalArgumentsWorksCorrectly")
+    public void expressionWithBadArgumentsWorksCorrectly(){
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("5#2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("S/2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3**2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3S/2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("33//2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("51#2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("((51#2)*2)+3"));
     }
 
 
