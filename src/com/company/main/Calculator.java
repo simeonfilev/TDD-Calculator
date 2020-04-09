@@ -11,8 +11,11 @@ public class Calculator {
     public double divide(double a, double b){
        return 0;
     }
-
     public double multiply(double a, double b) {
+        return 0;
+    }
+
+    public double calculate(String expression) {
         return 0;
     }
 }
