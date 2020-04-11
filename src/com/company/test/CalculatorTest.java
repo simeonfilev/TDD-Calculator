@@ -19,6 +19,7 @@ public class CalculatorTest {
         Assertions.assertEquals(4,calculator.calculate("8/2"));
         Assertions.assertEquals(5,calculator.calculate("1+4"));
         Assertions.assertEquals(3,calculator.calculate("5-2"));
+        Assertions.assertEquals(-7,calculator.calculate("-5-2"));
         Assertions.assertEquals(3,calculator.calculate(" 5  - 2"));
     }
 
@@ -41,6 +42,7 @@ public class CalculatorTest {
         Assertions.assertEquals(8,calculator.calculate("10-2*1"));
         Assertions.assertEquals(40,calculator.calculate("5*10-2*5"));
         Assertions.assertEquals(14,calculator.calculate("(5+2)*2"));
+        Assertions.assertEquals(-20,calculator.calculate("-(2+3)*4"));
         Assertions.assertEquals(2,calculator.calculate("((5+3)/2)/2"));
     }
 
@@ -48,6 +50,8 @@ public class CalculatorTest {
     @DisplayName("ExpressionWithIllegalArgumentsWorksCorrectly")
     public void expressionWithBadArgumentsWorksCorrectly(){
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("5#2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("(5+2))"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("*5+2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("S/2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3**2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3S/2"));
@@ -69,7 +73,10 @@ public class CalculatorTest {
     @DisplayName("SubtractingTwoNumbersWorkCorrectly")
     public void subtractingWorksCorrectly(){
         Assertions.assertEquals(5,calculator.subtract(10,5));
-        Assertions.assertEquals(-15,calculator.subtract(-5,-10));
+        Assertions.assertEquals(5,calculator.subtract(-5,-10));
+        Assertions.assertEquals(-5,calculator.subtract(-10,-5));
+        Assertions.assertEquals(-7,calculator.subtract(-5,2));
+        Assertions.assertEquals(-3,calculator.subtract(-5,-2));
         Assertions.assertEquals(0,calculator.subtract(0,0));
     }
 
