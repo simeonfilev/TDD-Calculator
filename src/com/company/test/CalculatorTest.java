@@ -44,6 +44,8 @@ public class CalculatorTest {
         Assertions.assertEquals(14,calculator.calculate("(5+2)*2"));
         Assertions.assertEquals(-20,calculator.calculate("-(2+3)*4"));
         Assertions.assertEquals(2,calculator.calculate("((5+3)/2)/2"));
+        Assertions.assertEquals(9,calculator.calculate("(2+3+4)"));
+        Assertions.assertEquals(18,calculator.calculate("(2+3*4)+3*2-2"));
     }
 
     @Test

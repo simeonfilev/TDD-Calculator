@@ -48,18 +48,22 @@ public class Calculator {
         return Double.parseDouble(expression);
     }
 
+    private String calculateMatchedExpression(Matcher matcher){
+        double firstNumber = Double.parseDouble(matcher.group(1));
+        char mathOperator = matcher.group(2).charAt(0);
+        double secondNumber = Double.parseDouble(matcher.group(3));
+        String expressionToCalculate = "" + firstNumber + mathOperator + secondNumber;
+        return String.valueOf(calculateSingleExpression(expressionToCalculate));
+    }
+
     private String calculateNonPriorityExpressions(String expression) {
         String priorityRegex = "(-?[0-9.]+)(["  +Pattern.quote(mathOperators.toString()) +"])([\\d.]+)";
+        Pattern pattern = Pattern.compile(priorityRegex);
         while (getExpressionsCount(expression) > 0) {
-            Pattern pattern = Pattern.compile(priorityRegex);
             Matcher matcher = pattern.matcher(expression);
             while (matcher.find()) {
-                double firstNumber = Double.parseDouble(matcher.group(1));
-                char mathOperator = matcher.group(2).charAt(0);
-                double secondNumber = Double.parseDouble(matcher.group(3));
-                String expressionToCalculate = "(" + firstNumber + mathOperator + secondNumber + ")";
-                String answer = calculateParenthesis(expressionToCalculate);
-                expression = expression.replaceAll(Pattern.quote(matcher.group(0)), answer);
+               String calculatedExpression = calculateMatchedExpression(matcher);
+               expression = expression.replaceAll(Pattern.quote(matcher.group(0)), calculatedExpression);
             }
         }
         return expression;
@@ -67,16 +71,12 @@ public class Calculator {
 
     private String calculatePriorityExpressions(String expression) {
         String priorityRegex = "([\\d.]+)(["+ Pattern.quote(operatorWithPriority.toString()) +"])([\\d.]+)";
+        Pattern pattern = Pattern.compile(priorityRegex);
         while (getPriorityOperatorsCount(expression) > 0) {
-            Pattern pattern = Pattern.compile(priorityRegex);
             Matcher matcher = pattern.matcher(expression);
             while (matcher.find()) {
-                double firstNumber = Double.parseDouble(matcher.group(1));
-                char mathOperator = matcher.group(2).charAt(0);
-                double secondNumber = Double.parseDouble(matcher.group(3));
-                String expressionToCalculate = "(" + firstNumber + mathOperator + secondNumber + ")";
-                String answer = calculateParenthesis(expressionToCalculate);
-                expression = expression.replaceAll(Pattern.quote(matcher.group(0)), answer);
+                String calculatedExpression = calculateMatchedExpression(matcher);
+                expression = expression.replaceAll(Pattern.quote(matcher.group(0)), calculatedExpression);
             }
         }
         return expression;
@@ -157,11 +157,13 @@ public class Calculator {
     private String calculateParenthesis(String expression) {
         while (hasParentheses(expression)) {
             String nestedExpression = getNestedParenthesesExpression(expression);
+            String calculateExpression = nestedExpression;
             //TODO may have more than two numbers in parenthesis
-            double nestedExpressionAnswer = calculateSingleExpression(nestedExpression);
+            calculateExpression = calculatePriorityExpressions(calculateExpression);
+            calculateExpression = calculateNonPriorityExpressions(calculateExpression);
+            //double nestedExpressionAnswer = calculateSingleExpression(nestedExpression);
             String toReplaceExpression = "(" + nestedExpression + ")";
-            boolean s = expression.contains(toReplaceExpression);
-            expression = expression.replaceAll(Pattern.quote(toReplaceExpression), Double.toString(nestedExpressionAnswer));
+            expression = expression.replaceAll(Pattern.quote(toReplaceExpression),calculateExpression);
         }
         return expression;
     }
@@ -236,7 +238,6 @@ public class Calculator {
         }
         return false;
     }
-
 
     private boolean containsIllegalArguments(String expression) {
         return containsIllegalSymbols(expression) || !parenthesesAreMatching(expression)
