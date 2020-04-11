@@ -38,7 +38,6 @@ public class Calculator {
 
     public double calculate(String expression) {
         expression = removeWhiteSpaces(expression);
-        //expression = fixMinusInFrontOfExpression(expression);
         if (containsIllegalArguments(expression)) {
             throw new UnsupportedOperationException();
         }
