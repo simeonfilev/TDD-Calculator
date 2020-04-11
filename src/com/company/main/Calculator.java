@@ -49,7 +49,7 @@ public class Calculator {
     }
 
     private String calculateNonPriorityExpressions(String expression) {
-        String priorityRegex = "(-?[0-9.]+)([+-])([\\d.]+)"; //TODO MAKE IT FROM MATH OPERATOR CONSTANT
+        String priorityRegex = "(-?[0-9.]+)(["  +Pattern.quote(mathOperators.toString()) +"])([\\d.]+)";
         while (getExpressionsCount(expression) > 0) {
             Pattern pattern = Pattern.compile(priorityRegex);
             Matcher matcher = pattern.matcher(expression);
@@ -61,14 +61,12 @@ public class Calculator {
                 String answer = calculateParenthesis(expressionToCalculate);
                 expression = expression.replaceAll(Pattern.quote(matcher.group(0)), answer);
             }
-
         }
-
         return expression;
     }
 
     private String calculatePriorityExpressions(String expression) {
-        String priorityRegex = "([\\d.]+)([*\\/])([\\d.]+)"; //TODO MAKE IT FROM MATH OPERATOR
+        String priorityRegex = "([\\d.]+)(["+ Pattern.quote(operatorWithPriority.toString()) +"])([\\d.]+)";
         while (getPriorityOperatorsCount(expression) > 0) {
             Pattern pattern = Pattern.compile(priorityRegex);
             Matcher matcher = pattern.matcher(expression);
