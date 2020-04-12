@@ -212,7 +212,7 @@ public class Calculator {
         return false;
     }
 
-    private boolean parenthesesAreMatching(String expression) {
+    private boolean parenthesesAreNotMatching(String expression) {
         Stack<Character> parenthesesStack = new Stack<>();
         for (int index = 0; index < expression.length(); index++) {
             char currentChar = expression.charAt(index);
@@ -221,12 +221,12 @@ public class Calculator {
             }
             if (currentChar == ')') {
                 if (parenthesesStack.isEmpty() || parenthesesStack.peek() != '(') {
-                    return false;
+                    return true;
                 }
                 parenthesesStack.pop();
             }
         }
-        return parenthesesStack.isEmpty();
+        return !parenthesesStack.isEmpty();
     }
 
     private String removeWhiteSpaces(String expression) {
@@ -244,7 +244,7 @@ public class Calculator {
     }
 
     private boolean containsIllegalArguments(String expression) {
-        return containsIllegalSymbols(expression) || !parenthesesAreMatching(expression)
+        return containsIllegalSymbols(expression) || parenthesesAreNotMatching(expression)
                 || containsMultipleMathOperators(expression) || expression.equals("")
                 || startsWithMathSignOtherThanMinus(expression);
     }

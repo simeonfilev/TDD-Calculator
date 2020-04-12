@@ -36,7 +36,7 @@ public class CalculatorTest {
     @Test
     @DisplayName("ExpressionWithPrioritiesWorksCorrectly")
     public void expressionWithPrioritiesWorksCorrectly(){
-        Assertions.assertEquals(18,calculator.calculate("10+4*2"));
+        Assertions.assertEquals(18,calculator.calculate("()()10+4*2"));
         Assertions.assertEquals(4,calculator.calculate("100/5/5"));
         Assertions.assertEquals(20,calculator.calculate("10+5+5"));
         Assertions.assertEquals(8,calculator.calculate("10-2*1"));
@@ -55,6 +55,7 @@ public class CalculatorTest {
     public void expressionWithBadArgumentsWorksCorrectly(){
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("5#2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("(5+2))"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("()5+2))"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("*5+2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("S/2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3**2"));
