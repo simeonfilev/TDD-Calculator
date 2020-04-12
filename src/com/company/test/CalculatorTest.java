@@ -46,6 +46,8 @@ public class CalculatorTest {
         Assertions.assertEquals(2,calculator.calculate("((5+3)/2)/2"));
         Assertions.assertEquals(9,calculator.calculate("(2+3+4)"));
         Assertions.assertEquals(18,calculator.calculate("(2+3*4)+3*2-2"));
+        Assertions.assertEquals(2,calculator.calculate("(((-2*3)+5)+5)/2"));
+        Assertions.assertEquals(8,calculator.calculate("(((-2*-3)+5)+5)/2"));
     }
 
     @Test
@@ -97,5 +99,6 @@ public class CalculatorTest {
         Assertions.assertEquals(10, calculator.multiply(2,5));
         Assertions.assertEquals(0,calculator.multiply(5,0));
         Assertions.assertEquals(-15,calculator.multiply(-5,3));
+        Assertions.assertEquals(15,calculator.multiply(-5,-3));
     }
 }

@@ -41,11 +41,15 @@ public class Calculator {
         if (containsIllegalArguments(expression)) {
             throw new UnsupportedOperationException();
         }
+        double calculatedAnswer = calculateExpression(expression);
+        return calculatedAnswer;
+    }
+
+    private Double calculateExpression(String expression){
         expression = calculateParenthesis(expression);
         expression = calculatePriorityExpressions(expression);
         expression = calculateNonPriorityExpressions(expression);
-
-        return Double.parseDouble(expression);
+        return Double.valueOf(expression);
     }
 
     private String calculateMatchedExpression(Matcher matcher){
@@ -70,7 +74,7 @@ public class Calculator {
     }
 
     private String calculatePriorityExpressions(String expression) {
-        String priorityRegex = "([\\d.]+)(["+ Pattern.quote(operatorWithPriority.toString()) +"])([\\d.]+)";
+        String priorityRegex = "(-?[\\d.]+)(["+ Pattern.quote(operatorWithPriority.toString()) +"])(-?[\\d.]+)";
         Pattern pattern = Pattern.compile(priorityRegex);
         while (getPriorityOperatorsCount(expression) > 0) {
             Matcher matcher = pattern.matcher(expression);
@@ -97,11 +101,15 @@ public class Calculator {
         return isMathOperator(firstChar) && firstChar != '-';
     }
 
-    public double calculateSingleExpression(String expression) {
+    private String removeParenthesisFromExpression(String expression){
         if (hasParentheses(expression)) {
             expression = expression.replace("(", "").replace(")", "");
         }
+        return expression;
+    }
 
+    private double calculateSingleExpression(String expression) {
+        expression = removeParenthesisFromExpression(expression);
         char mathOperator = getOperatorSingleExpression(expression);
         List<Double> numbers = getNumbersFromSingleExpression(expression);
         Double firstNumber = numbers.get(0);
@@ -158,10 +166,8 @@ public class Calculator {
         while (hasParentheses(expression)) {
             String nestedExpression = getNestedParenthesesExpression(expression);
             String calculateExpression = nestedExpression;
-            //TODO may have more than two numbers in parenthesis
             calculateExpression = calculatePriorityExpressions(calculateExpression);
             calculateExpression = calculateNonPriorityExpressions(calculateExpression);
-            //double nestedExpressionAnswer = calculateSingleExpression(nestedExpression);
             String toReplaceExpression = "(" + nestedExpression + ")";
             expression = expression.replaceAll(Pattern.quote(toReplaceExpression),calculateExpression);
         }
@@ -198,10 +204,8 @@ public class Calculator {
     private boolean containsMultipleMathOperators(String expression) {
         for (int index = 1; index < expression.length() - 1; index++) {
             char currentChar = expression.charAt(index);
-            char previousChar = expression.charAt(index - 1);
             char nextChar = expression.charAt(index + 1);
-            if ((isMathOperator(currentChar) && isMathOperator(previousChar)) ||
-                    (isMathOperator(currentChar) && isMathOperator(nextChar))) {
+            if ((isMathOperator(currentChar) && nextChar==currentChar)) {
                 return true;
             }
         }
