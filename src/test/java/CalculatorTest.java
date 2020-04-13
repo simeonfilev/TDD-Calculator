@@ -1,6 +1,3 @@
-package com.company.test;
-
-import com.company.main.Calculator;
 import org.junit.jupiter.api.*;
 
 public class CalculatorTest {
