@@ -1,15 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Calculator {
-
     public static final List<Character> validSymbols = List.of('*', '/', '+', '-', '(', ')');
     public static final List<Character> mathOperators = List.of('*', '/', '+', '-');
-    public static final List<Character> operatorWithPriority = List.of('*', '/');
-
 
     public double add(double a, double b) {
         return a + b;
@@ -36,180 +31,131 @@ public class Calculator {
         return a * b;
     }
 
-    public double calculate(String expression) {
+    public double calculate(String expression){
         expression = removeWhiteSpaces(expression);
         if (containsIllegalArguments(expression)) {
             throw new UnsupportedOperationException();
         }
-        double calculatedAnswer = calculateExpression(expression);
-        return calculatedAnswer;
+        List<String> tokenizedExpression = tokenizeMathExpression(expression);
+        List<String> expressonToRPN = convertExpressionToRPN(tokenizedExpression);
+        double ans = calculateRPNExpression(expressonToRPN);
+        return ans;
+
+
     }
 
-    private Double calculateExpression(String expression){
-        expression = calculateParenthesis(expression);
-        expression = calculatePriorityExpressions(expression);
-        expression = calculateNonPriorityExpressions(expression);
-        return Double.valueOf(expression);
+    private static boolean isANumber(String input){
+        try{
+            double number = Double.parseDouble(input);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
-    private String calculateMatchedExpression(Matcher matcher){
-        double firstNumber = Double.parseDouble(matcher.group(1));
-        char mathOperator = matcher.group(2).charAt(0);
-        double secondNumber = Double.parseDouble(matcher.group(3));
-        String expressionToCalculate = "" + firstNumber + mathOperator + secondNumber;
-        return String.valueOf(calculateSingleExpression(expressionToCalculate));
-    }
+    private double calculateRPNExpression(List<String> tokens) {
+        Stack<String> stack = new Stack<>();
+        for (String token : tokens) {
+            if (isANumber(token)) {
+                stack.push(token);
+            }
+            else {
+                Double d2 = Double.valueOf( stack.pop() );
+                Double d1 = Double.valueOf( stack.pop() );
 
-    private String calculateNonPriorityExpressions(String expression) {
-        String priorityRegex = "(-?[0-9.]+)(["  +Pattern.quote(mathOperators.toString()) +"])([\\d.]+)";
-        Pattern pattern = Pattern.compile(priorityRegex);
-        while (getExpressionsCount(expression) > 0) {
-            Matcher matcher = pattern.matcher(expression);
-            while (matcher.find()) {
-               String calculatedExpression = calculateMatchedExpression(matcher);
-               expression = expression.replaceAll(Pattern.quote(matcher.group(0)), calculatedExpression);
+                double result = 0.0;
+                switch (token){
+                    case "+":
+                        result = add(d1,d2);
+                        break;
+                    case "*":
+                        result = multiply(d1,d2);
+                        break;
+                    case "-":
+                        result = subtract(d1,d2);
+                        break;
+                    case "/":
+                        result = divide(d1,d2);
+                }
+                stack.push( String.valueOf( result ));
             }
         }
-        return expression;
+        return Double.parseDouble(stack.pop());
     }
 
-    private String calculatePriorityExpressions(String expression) {
-        String priorityRegex = "(-?[\\d.]+)(["+ Pattern.quote(operatorWithPriority.toString()) +"])(-?[\\d.]+)";
-        Pattern pattern = Pattern.compile(priorityRegex);
-        while (getPriorityOperatorsCount(expression) > 0) {
-            Matcher matcher = pattern.matcher(expression);
-            while (matcher.find()) {
-                String calculatedExpression = calculateMatchedExpression(matcher);
-                expression = expression.replaceAll(Pattern.quote(matcher.group(0)), calculatedExpression);
+    private boolean isMathOperator(char c){
+        return mathOperators.contains(c);
+    }
+
+    public List<String> tokenizeMathExpression(String expression){
+        List<String> tokenizedExpression = new ArrayList<>();
+        StringBuilder acc = new StringBuilder();
+        for(int i=0;i<expression.length();i++){
+            char currentChar = expression.charAt(i);
+            if(Character.isDigit(currentChar)){
+                acc.append(currentChar);
+            }
+           else if(currentChar =='-' && i==0){
+                acc.append('-');
+            }
+           else if(isMathOperator(currentChar) && expression.charAt(i+1)=='-'){
+                acc.append('-');
+            }
+            else if(validSymbols.contains(currentChar)){
+                if(acc.length()!=0){
+                    tokenizedExpression.add(acc.toString());
+                    acc = new StringBuilder();
+                }
+                tokenizedExpression.add(String.valueOf(expression.charAt(i)));
             }
         }
-        return expression;
+        if(acc.length()!=0)
+            tokenizedExpression.add(String.valueOf(acc));
+        return tokenizedExpression;
     }
 
-    private Integer getPriorityOperatorsCount(String expression) {
-        int priorityOperatorsCount = 0;
 
-        for (int index = 0; index < expression.length(); index++) {
-            if (operatorWithPriority.contains(expression.charAt(index)))
-                priorityOperatorsCount++;
-        }
-        return priorityOperatorsCount;
-    }
 
-    private boolean startsWithMathSignOtherThanMinus(String expression) {
-        char firstChar = expression.charAt(0);
-        return isMathOperator(firstChar) && firstChar != '-';
-    }
+    public List<String> convertExpressionToRPN(List<String> inputTokens)
+    {
+        List<String> output = new ArrayList<>();
+        Stack<String> stack = new Stack<>();
 
-    private String removeParenthesisFromExpression(String expression){
-        if (hasParentheses(expression)) {
-            expression = expression.replace("(", "").replace(")", "");
-        }
-        return expression;
-    }
-
-    private double calculateSingleExpression(String expression) {
-        expression = removeParenthesisFromExpression(expression);
-        char mathOperator = getOperatorSingleExpression(expression);
-        List<Double> numbers = getNumbersFromSingleExpression(expression);
-        Double firstNumber = numbers.get(0);
-        Double secondNumber = numbers.get(1);
-
-        switch (mathOperator) {
-            case '*':
-                return multiply(firstNumber, secondNumber);
-            case '/':
-                return divide(firstNumber, secondNumber);
-            case '+':
-                return add(firstNumber, secondNumber);
-            case '-':
-                return subtract(firstNumber, secondNumber);
-        }
-        return 0;
-    }
-
-    private List<Double> getNumbersFromSingleExpression(String expression) {
-        List<Double> numbers = new ArrayList<>();
-        int mathOperator = getOperatorIndex(expression);
-        Double firstNumber = Double.parseDouble(expression.substring(0, mathOperator));
-        Double secondNumber = Double.parseDouble(expression.substring(mathOperator + 1));
-        numbers.add(firstNumber);
-        numbers.add(secondNumber);
-        return numbers;
-    }
-
-    private boolean isMathOperator(char symbol) {
-        return mathOperators.contains(symbol);
-    }
-
-    private int getOperatorIndex(String expression) {
-        for (int index = 1; index < expression.length(); index++) {
-            char currentChar = expression.charAt(index);
-            if (isMathOperator(currentChar)) {
-                return index;
+        for (String token : inputTokens) {
+            if(isANumber(token)){
+                output.add(token);
             }
-        }
-        return 0;
-    }
-
-    private char getOperatorSingleExpression(String expression) {
-        for (int index = 1; index < expression.length(); index++) {
-            char currentChar = expression.charAt(index);
-            if (isMathOperator(currentChar)) {
-                return currentChar;
+            else if(token.equals("(")){
+                stack.push(token);
             }
-        }
-        return 0;
-    }
-
-    private String calculateParenthesis(String expression) {
-        while (hasParentheses(expression)) {
-            String nestedExpression = getNestedParenthesesExpression(expression);
-            String calculateExpression = nestedExpression;
-            calculateExpression = calculatePriorityExpressions(calculateExpression);
-            calculateExpression = calculateNonPriorityExpressions(calculateExpression);
-            String toReplaceExpression = "(" + nestedExpression + ")";
-            expression = expression.replaceAll(Pattern.quote(toReplaceExpression),calculateExpression);
-        }
-        return expression;
-    }
-
-    private int getExpressionsCount(String expression) {
-        int countExpressions = 0;
-        for (int index = 1; index < expression.length(); index++) {
-            char currentChar = expression.charAt(index);
-            if (isMathOperator(currentChar))
-                countExpressions++;
-        }
-        return countExpressions;
-    }
-
-    private String getNestedParenthesesExpression(String expression) {
-        while (hasParentheses(expression)) {
-            int indexOfClosingParentheses = expression.indexOf(')');
-            for (int index = indexOfClosingParentheses - 1; index >= 0; index--) {
-                if (expression.charAt(index) == '(') {
-                    expression = expression.substring(index + 1, indexOfClosingParentheses);
+            else if(token.equals(")")){
+                while (!stack.empty() && !stack.peek().equals("(")) {
+                    output.add(stack.pop());
+                }
+                stack.pop();
+            }
+            else{
+                while (!stack.empty() && isMathOperator(stack.peek())) {
+                    if((stack.peek().equals("*") || stack.peek().equals("/"))){
+                        output.add(stack.pop());
+                        continue;
+                    }
                     break;
                 }
+                stack.push(token);
             }
         }
-        return expression;
-    }
-
-    private boolean hasParentheses(String expression) {
-        return expression.contains("(");
-    }
-
-    private boolean containsMultipleMathOperators(String expression) {
-        for (int index = 1; index < expression.length() - 1; index++) {
-            char currentChar = expression.charAt(index);
-            char nextChar = expression.charAt(index + 1);
-            if ((isMathOperator(currentChar) && nextChar==currentChar)) {
-                return true;
-            }
+        while (!stack.empty()) {
+            output.add(stack.pop());
         }
-        return false;
+        return output;
+    }
+
+
+
+
+    private boolean isMathOperator(String symbol) {
+        return mathOperators.contains(symbol);
     }
 
     private boolean parenthesesAreNotMatching(String expression) {
@@ -244,8 +190,7 @@ public class Calculator {
     }
 
     private boolean containsIllegalArguments(String expression) {
-        return containsIllegalSymbols(expression) || parenthesesAreNotMatching(expression)
-                || containsMultipleMathOperators(expression) || expression.equals("")
-                || startsWithMathSignOtherThanMinus(expression);
+        return containsIllegalSymbols(expression) || parenthesesAreNotMatching(expression);
+            //    || containsMultipleMathOperators(expression) || expression.equals("");
     }
 }
