@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Calculator {
     public static final List<Character> validSymbols = List.of('*', '/', '+', '-', '(', ')');
@@ -33,20 +31,20 @@ public class Calculator {
 
     public double calculate(String expression){
         expression = removeWhiteSpaces(expression);
+
         if (containsIllegalArguments(expression)) {
             throw new UnsupportedOperationException();
         }
+
         List<String> tokenizedExpression = tokenizeMathExpression(expression);
-        List<String> expressonToRPN = convertExpressionToRPN(tokenizedExpression);
-        double ans = calculateRPNExpression(expressonToRPN);
-        return ans;
+        List<String> expressionToRPN = convertExpressionToRPN(tokenizedExpression);
 
-
+        return calculateRPNExpression(expressionToRPN);
     }
 
     private static boolean isANumber(String input){
         try{
-            double number = Double.parseDouble(input);
+            Double.parseDouble(input);
             return true;
         }catch (Exception e){
             return false;
@@ -60,8 +58,14 @@ public class Calculator {
                 stack.push(token);
             }
             else {
-                Double d2 = Double.valueOf( stack.pop() );
-                Double d1 = Double.valueOf( stack.pop() );
+                if(stack.size()<2){
+                    if(token.equals("-")){
+                        stack.push(String.valueOf(Double.parseDouble(stack.pop()) * -1));
+                    }
+                    continue;
+                }
+                double d2 = Double.parseDouble(stack.pop());
+                double d1 = Double.parseDouble(stack.pop());
 
                 double result = 0.0;
                 switch (token){
@@ -114,8 +118,6 @@ public class Calculator {
         return tokenizedExpression;
     }
 
-
-
     public List<String> convertExpressionToRPN(List<String> inputTokens)
     {
         List<String> output = new ArrayList<>();
@@ -134,15 +136,14 @@ public class Calculator {
                 }
                 stack.pop();
             }
-            else{
-                while (!stack.empty() && isMathOperator(stack.peek())) {
-                    if((stack.peek().equals("*") || stack.peek().equals("/"))){
-                        output.add(stack.pop());
-                        continue;
-                    }
-                    break;
+            else if(validSymbols.contains(token.charAt(0))){
+                while (!stack.empty() && (operatorPriorityCount(token)<=operatorPriorityCount(stack.peek()))) {
+                    output.add(stack.pop());
                 }
                 stack.push(token);
+            }
+            else{
+                throw new UnsupportedOperationException();
             }
         }
         while (!stack.empty()) {
@@ -151,11 +152,14 @@ public class Calculator {
         return output;
     }
 
-
-
-
-    private boolean isMathOperator(String symbol) {
-        return mathOperators.contains(symbol);
+    private int operatorPriorityCount(String operator){
+        Map<String,Integer> priorityOperatorsMap = new HashMap<>();
+        priorityOperatorsMap.put("-",1);
+        priorityOperatorsMap.put("+",1);
+        priorityOperatorsMap.put("*",10);
+        priorityOperatorsMap.put("/",10);
+        priorityOperatorsMap.put("(",0);
+        return priorityOperatorsMap.get(operator);
     }
 
     private boolean parenthesesAreNotMatching(String expression) {
@@ -179,6 +183,21 @@ public class Calculator {
         return expression.replaceAll("\\s+", "");
     }
 
+    private boolean containsMultipleMathOperators(String expression){
+        for(int index =0; index<expression.length()-1;index++){
+            char currentChar = expression.charAt(index);
+            char nextChar = expression.charAt(index+1);
+            if(isMathOperator(currentChar) && currentChar == nextChar){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean startsWithASignOtherThanMinus(String expression){
+        return isMathOperator(expression.charAt(0)) && expression.charAt(0) != '-';
+    }
+
     private boolean containsIllegalSymbols(String expression) {
         for (int index = 0; index < expression.length(); index++) {
             char currentChar = expression.charAt(index);
@@ -190,7 +209,8 @@ public class Calculator {
     }
 
     private boolean containsIllegalArguments(String expression) {
-        return containsIllegalSymbols(expression) || parenthesesAreNotMatching(expression);
-            //    || containsMultipleMathOperators(expression) || expression.equals("");
+        return containsIllegalSymbols(expression) || parenthesesAreNotMatching(expression)
+                || containsMultipleMathOperators(expression) || expression.equals("")
+                || startsWithASignOtherThanMinus(expression);
     }
 }

@@ -44,15 +44,14 @@ public class CalculatorTest {
         Assertions.assertEquals(9,calculator.calculate("(2+3+4)"));
         Assertions.assertEquals(18,calculator.calculate("(2+3*4)+3*2-2"));
         Assertions.assertEquals(2,calculator.calculate("(((-2*3)+5)+5)/2"));
-        Assertions.assertEquals(8,calculator.calculate("(((-2*-3)+5)+5)/2"));
     }
 
     @Test
     @DisplayName("ExpressionWithIllegalArgumentsWorksCorrectly")
     public void expressionWithBadArgumentsWorksCorrectly(){
-        // Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("*5+2"));
-        //    Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("33//2"));
-        //    Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3**2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("*5+2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("33//2"));
+        Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("3**2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("5#2"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("(5+2))"));
         Assertions.assertThrows(UnsupportedOperationException.class,() -> calculator.calculate("()5+2))"));
