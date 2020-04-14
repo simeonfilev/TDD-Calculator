@@ -15,7 +15,6 @@ public class CalculatorTest {
         Assertions.assertEquals(6,calculator.calculate("3*2"));
         Assertions.assertEquals(4,calculator.calculate("8/2"));
         Assertions.assertEquals(5,calculator.calculate("1+4"));
-        Assertions.assertEquals(5,calculator.calculate("1+4gi"));
         Assertions.assertEquals(3,calculator.calculate("5-2"));
         Assertions.assertEquals(-7,calculator.calculate("-5-2"));
         Assertions.assertEquals(3,calculator.calculate(" 5  - 2"));
