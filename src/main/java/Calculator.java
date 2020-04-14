@@ -42,15 +42,6 @@ public class Calculator {
         return calculateRPNExpression(expressionToRPN);
     }
 
-    private static boolean isANumber(String input){
-        try{
-            Double.parseDouble(input);
-            return true;
-        }catch (Exception e){
-            return false;
-        }
-    }
-
     private double calculateRPNExpression(List<String> tokens) {
         Stack<String> stack = new Stack<>();
         for (String token : tokens) {
