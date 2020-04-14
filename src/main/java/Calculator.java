@@ -64,22 +64,22 @@ public class Calculator {
                     }
                     continue;
                 }
-                double d2 = Double.parseDouble(stack.pop());
-                double d1 = Double.parseDouble(stack.pop());
+                double secondNumber = Double.parseDouble(stack.pop());
+                double firstNumber = Double.parseDouble(stack.pop());
 
                 double result = 0.0;
                 switch (token){
                     case "+":
-                        result = add(d1,d2);
+                        result = add(firstNumber,secondNumber);
                         break;
                     case "*":
-                        result = multiply(d1,d2);
+                        result = multiply(firstNumber,secondNumber);
                         break;
                     case "-":
-                        result = subtract(d1,d2);
+                        result = subtract(firstNumber,secondNumber);
                         break;
                     case "/":
-                        result = divide(d1,d2);
+                        result = divide(firstNumber,secondNumber);
                 }
                 stack.push( String.valueOf( result ));
             }
