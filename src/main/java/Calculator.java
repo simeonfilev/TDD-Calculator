@@ -1,8 +1,8 @@
 import java.util.*;
 
 public class Calculator {
-    public static final List<Character> validSymbols = List.of('*', '/', '+', '-', '(', ')');
-    public static final List<Character> mathOperators = List.of('*', '/', '+', '-');
+    private static final List<Character> validSymbols = List.of('*', '/', '+', '-', '(', ')');
+    private static final List<Character> mathOperators = List.of('*', '/', '+', '-');
 
     public double add(double a, double b) {
         return a + b;
@@ -40,6 +40,18 @@ public class Calculator {
         List<String> expressionToRPN = convertExpressionToRPN(tokenizedExpression);
 
         return calculateRPNExpression(expressionToRPN);
+    }
+
+    private boolean isANumber(String text){
+        if(text.length()==1 && !Character.isDigit(text.charAt(0))){
+            return false;
+        }
+        for(int i =1; i<text.length();i++){
+            if(!Character.isDigit(text.charAt(i))){
+                return false;
+          }
+        }
+        return true;
     }
 
     private double calculateRPNExpression(List<String> tokens) {
@@ -82,7 +94,7 @@ public class Calculator {
         return mathOperators.contains(c);
     }
 
-    public List<String> tokenizeMathExpression(String expression){
+    private List<String> tokenizeMathExpression(String expression){
         List<String> tokenizedExpression = new ArrayList<>();
         StringBuilder acc = new StringBuilder();
         for(int i=0;i<expression.length();i++){
@@ -109,7 +121,7 @@ public class Calculator {
         return tokenizedExpression;
     }
 
-    public List<String> convertExpressionToRPN(List<String> inputTokens)
+    private List<String> convertExpressionToRPN(List<String> inputTokens) throws UnsupportedOperationException
     {
         List<String> output = new ArrayList<>();
         Stack<String> stack = new Stack<>();
@@ -144,13 +156,7 @@ public class Calculator {
     }
 
     private int operatorPriorityCount(String operator){
-        Map<String,Integer> priorityOperatorsMap = new HashMap<>();
-        priorityOperatorsMap.put("-",1);
-        priorityOperatorsMap.put("+",1);
-        priorityOperatorsMap.put("*",10);
-        priorityOperatorsMap.put("/",10);
-        priorityOperatorsMap.put("(",0);
-        return priorityOperatorsMap.get(operator);
+        return Operators.getPriorityOfOperator(operator);
     }
 
     private boolean parenthesesAreNotMatching(String expression) {
